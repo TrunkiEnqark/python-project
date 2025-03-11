@@ -1,0 +1,23 @@
+[
+    {
+        "emp_id": "T001",
+        "emp_name": "Nguyen Van A",
+        "base_sal": 15000000,
+        "bonus_rate": 0.2,
+        "type": "AT"
+    },
+    {
+        "emp_id": "T002",
+        "emp_name": "Tran Thi B",
+        "base_sal": 12000000,
+        "bonus_rate": 0.1,
+        "type": "AM"
+    },
+    {
+        "emp_id": "T003",
+        "emp_name": "Le Van C",
+        "base_sal": 14000000,
+        "bonus_rate": 0.15,
+        "type": "MT"
+    }
+]
