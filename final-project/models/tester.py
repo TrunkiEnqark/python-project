@@ -1,10 +1,10 @@
-from employee import Employee
+from models.employee import Employee
 from enum import Enum
 
 class TesterType(Enum):
     AT = 1 # Automation Test
     AM = 2 # AM/Manual Test
-    MT = 3
+    MT = 3 # MT
 
 class Tester(Employee):
     # Constructor
@@ -14,5 +14,5 @@ class Tester(Employee):
         self.__bonus_rate = bonus_rate
         self.type = type
     
-    def get_salary(self):
+    def get_salary(self) -> int:
         return (1 + self.__bonus_rate) * self._base_sal

@@ -1,2 +1,3 @@
-import uuid
-print(hex(uuid.uuid4().fields[0])[2:])
+from utils.utils import id_generator
+
+print(id_generator())
