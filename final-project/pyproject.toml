@@ -1,0 +1,18 @@
+[tool.poetry]
+name = "final-project"
+version = "0.1.0"
+description = ""
+authors = ["Trunki Enqark <trunki.enqark@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+numpy = "^2.2.3"
+urwid = "^2.6.16"
+rich = "^13.9.4"
+uuid = "^1.30"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
