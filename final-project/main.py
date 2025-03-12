@@ -1,3 +1,5 @@
+import os
+
 from models import *
 from utils.utils import *
 
@@ -23,10 +25,13 @@ developer_manager = DevManager()
 
 if __name__ == '__main__':
     while True:
+        os.system('cls')
         print("\n=== Developer Management System ===")
         choice = menu(OPTIONS)
         match choice:
             case 1:
+                # Show employees
+                os.system('cls')
                 print('\n=== Employee List ===')
                 print('Developer Table:')
                 developer_manager.display_all()
@@ -38,18 +43,20 @@ if __name__ == '__main__':
                     continue
 
             case 2:
+                os.system('cls')
                 # Add Employee (Developer or Tester)
-                emp_type = input("Add Developer (d) or Tester (t): ").lower()
-
                 emp_name = input("Enter employee name: ")
                 base_sal = int(input("Enter base salary: "))
+                emp_type = input("Add Developer (d) or Tester (t): ").lower()
 
                 if emp_type == 'd':
-                    # Add Developer
                     team_name = input("Enter team name: ")
                     programming_languages = input("Enter programming languages (comma-separated): ").split(',')
                     exp_year = int(input("Enter experience years: "))
-                    is_leader = input("Is this developer a leader? (y/n): ").lower() == 'y'
+                    is_leader = False
+                    
+                    if developer_manager.has_leader(team_name):
+                        is_leader = input("Is this developer a leader? (y/n): ").lower() == 'y'
 
                     if is_leader:
                         bonus_rate = float(input("Enter bonus rate (e.g., 0.1 for 10%): "))
@@ -61,21 +68,28 @@ if __name__ == '__main__':
                         print(f"Success: Added developer '{emp_name}' to team '{team_name}'.")
                     else:
                         print("Error: Failed to add developer. Check for duplicate ID or team leader conflict.")
+                
                 elif emp_type == 't':
-                    # Add Tester
-                    test_type = input("Enter tester type (Manual/Automation): ").capitalize()
-                    level = input("Enter tester level (Junior/Mid/Senior): ").capitalize()
+                    test_type = input("Enter tester type (AT/AM/MT): ").upper()
+                    try:
+                        tester_type = TesterType[test_type]  
+                    except KeyError:
+                        print("Invalid tester type! Choose one of AT, AM, MT.")
+                        continue
 
-                    new_tester = Tester(emp_name, base_sal, test_type, level)
+                    bonus_rate = float(input("Enter bonus rate (e.g., 0.1 for 10%): "))
+                    emp_id = id_generator() 
+                    new_tester = Tester(emp_name, base_sal, bonus_rate, tester_type, emp_id)
 
                     if tester_manager.add_tester(new_tester):
-                        print(f"Success: Added tester '{emp_name}' of type '{test_type}' and level '{level}'.")
+                        print(f"Success: Added tester '{emp_name}' of type '{tester_type.name}'.")
                     else:
                         print("Error: Failed to add tester. Check for duplicate ID.")
                 else:
                     print("Invalid employee type!")
 
             case 3:
+                os.system('cls')
                 # Update Employee
                 emp_id = input("Enter employee ID to update: ")
                 emp = developer_manager.get_dev(emp_id) or tester_manager.get_tester(emp_id)
@@ -107,6 +121,7 @@ if __name__ == '__main__':
 
             case 4:
                 # Search Employee
+                os.system('cls')
                 print("\n=== Search Employee ===")
                 search_choice = menu(SEARCH_MENU)
 

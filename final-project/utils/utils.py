@@ -16,3 +16,35 @@ def menu(options: list[str], attempts: int = 3) -> int:
             print("Please choose a valid number!")
         attempts -= 1
     return option # return the user's option
+
+def display_table(data: list[dict]):
+    if not data:
+        print("Không có dữ liệu để hiển thị.")
+        return
+
+    headers = set()
+    for item in data:
+        headers.update(item.keys())
+    headers = list(headers)
+    
+    col_widths = {header: len(header) for header in headers}
+    for item in data:
+        for header in headers:
+            if header in item:
+                col_widths[header] = max(col_widths[header], len(str(item[header])))
+    
+    separator = "+" + "+".join("-" * (col_widths[header] + 2) for header in headers) + "+"
+    
+    print(separator)
+    header_row = "| " + " | ".join(header.ljust(col_widths[header]) for header in headers) + " |"
+    print(header_row)
+    print(separator)
+    
+    for item in data:
+        row_values = []
+        for header in headers:
+            value = str(item.get(header, "")) if header in item else ""
+            row_values.append(value.ljust(col_widths[header]))
+        print("| " + " | ".join(row_values) + " |")
+    
+    print(separator)

@@ -30,5 +30,25 @@
         "salary": 12000000.0,
         "is_leader": true,
         "bonus_rate": 0.5
+    },
+    {
+        "emp_id": "6ccc39d0",
+        "emp_name": "ducvu",
+        "base_sal": 10,
+        "team_name": "lmaolmao",
+        "programming_languages": "python",
+        "exp_year": 1,
+        "salary": 10,
+        "is_leader": false
+    },
+    {
+        "emp_id": "9e88033d",
+        "emp_name": "ducvu",
+        "base_sal": 10000,
+        "team_name": "dkfj",
+        "programming_languages": "python",
+        "exp_year": 2403,
+        "salary": 4806010000,
+        "is_leader": false
     }
 ]

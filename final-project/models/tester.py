@@ -98,8 +98,9 @@ class TesterManager:
         if not self.testers:
             return None
         data = [dev.to_dict() for dev in self.testers.values()]
-        df = pd.DataFrame(data)
-        print(tabulate(df, headers='keys', tablefmt='pretty', showindex=False))
+        headers = data[0].keys()
+        rows = [list(dev.values()) for dev in data]
+        print(tabulate(rows, headers=headers, tablefmt="pretty", showindex=False))
         
     def sort_by_name(self, reverse=False):
         sorted_testers = sorted(self.testers.values(), key=lambda tester: tester.get_name(), reverse=reverse)

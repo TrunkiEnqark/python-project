@@ -19,5 +19,12 @@
         "base_sal": 14000000,
         "bonus_rate": 0.15,
         "type": "MT"
+    },
+    {
+        "emp_id": "900c8e54",
+        "emp_name": "ducvy",
+        "base_sal": 1000000,
+        "bonus_rate": 0.2,
+        "type": "AT"
     }
 ]

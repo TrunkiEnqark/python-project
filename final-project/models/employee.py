@@ -1,6 +1,7 @@
 from abc import ABC, abstractmethod
 from utils.utils import id_generator
 
+# Abstract Class
 class Employee(ABC):
     # Constructor
     # emp_code will be generating by id_generator using uuid

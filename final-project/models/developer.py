@@ -3,7 +3,7 @@ import json
 import pandas as pd
 
 from models.employee import Employee
-from utils.utils import id_generator
+from utils.utils import id_generator, display_table
 from tabulate import tabulate
 
 class Developer(Employee):
@@ -144,14 +144,17 @@ class DevManager:
         if not self.developers:
             return None
         data = [dev.to_dict() for dev in self.developers.values()]
-        df = pd.DataFrame(data)
-        print(tabulate(df, headers='keys', tablefmt='pretty', showindex=False))
+        # display_table(data)
+        headers = data[0].keys()
+        rows = [list(dev.values()) for dev in data]
+        print(tabulate(rows, headers=headers, tablefmt="pretty", showindex=False))
         
     def sort_by_name(self, reverse=False):
         sorted_devs = sorted(self.developers.values(), key=lambda dev: dev.get_name(), reverse=reverse)
         data = [dev.to_dict() for dev in sorted_devs]
-        df = pd.DataFrame(data)
-        print(tabulate(df, headers='keys', tablefmt='pretty', showindex=False))
+        headers = data[0].keys()
+        rows = [list(dev.values()) for dev in data]
+        print(tabulate(rows, headers=headers, tablefmt="pretty", showindex=False))
 
     def sort_by_salary(self, reverse=True):
         sorted_devs = sorted(self.developers.values(), key=lambda dev: dev.get_salary(), reverse=reverse)
