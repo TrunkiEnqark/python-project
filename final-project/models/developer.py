@@ -24,6 +24,9 @@ class Developer(Employee):
     def get_languages(self) -> list[str]:
         return self.__programming_languages
     
+    def get_exp_year(self) -> int:
+        return self.__exp_year
+    
     def is_leader(self) -> bool:
         return self.__is_leader
     
@@ -48,6 +51,12 @@ class Developer(Employee):
             'salary': self.get_salary(),
             'is_leader': self.__is_leader
         }
+        
+    def set_languages(self, new_languages: list[str]):
+        self.__programming_languages = new_languages
+
+    def set_exp_year(self, new_exp_year: int):
+        self.__exp_year = new_exp_year
 
 
 class TeamLeader(Developer):
@@ -64,100 +73,10 @@ class TeamLeader(Developer):
     def get_salary(self) -> float:
         return float((1 + self.__bonus_rate) * super().get_salary())
 
+    def set_bonus_rate(self, new_bonus_rate: float):
+        self.__bonus_rate = new_bonus_rate
+    
     def to_dict(self) -> dict:
         base_dict = super().to_dict()
         base_dict['bonus_rate'] = self.__bonus_rate
         return base_dict
-
-
-class DevManager:
-    def __init__(self, file_name: str = 'data/developers.json'):
-        self.__file_name = file_name
-        self.developers = self.load_dev()
-
-    def load_dev(self) -> dict:
-        if os.path.exists(self.__file_name):
-            with open(self.__file_name, 'r') as f:
-                dev_data = json.load(f)
-                developers = {}
-                for d in dev_data:
-                    if d.get('is_leader', False):
-                        developers[d['emp_id']] = TeamLeader(
-                            emp_id                  = d['emp_id'],
-                            emp_name                = d['emp_name'],
-                            base_sal                = d['base_sal'],
-                            team_name               = d['team_name'],
-                            programming_languages   = d['programming_languages'].split(','),
-                            exp_year                = d['exp_year'],
-                            bonus_rate              = d.get('bonus_rate', 0.0)
-                        )
-                    else:
-                        developers[d['emp_id']] = Developer(
-                            emp_id                  = d['emp_id'],
-                            emp_name                = d['emp_name'],
-                            base_sal                = d['base_sal'],
-                            team_name               = d['team_name'],
-                            programming_languages   = d['programming_languages'].split(','),
-                            exp_year                = d['exp_year']
-                        )
-                return developers
-        return {}
-
-    def save_dev(self) -> bool:
-        with open(self.__file_name, 'w') as f:
-            json.dump([d.to_dict() for d in self.developers.values()], f, indent=4)
-            return True
-        return False
-
-    def add_dev(self, new_dev: Developer | TeamLeader) -> bool:
-        emp_id = new_dev.get_id()
-        if emp_id in self.developers or (new_dev.is_leader() and self.has_leader(new_dev.get_team_name())):
-            return False
-        self.developers[emp_id] = new_dev
-        self.save_dev()
-        return True
-
-    def remove_dev(self, emp_id: str) -> bool:
-        if emp_id in self.developers:
-            del self.developers[emp_id]
-            self.save_dev()
-            return True
-        return False
-
-    def get_dev(self, emp_id: str) -> Developer:
-        return self.developers.get(emp_id, None)
-
-    def search_dev_by_name(self, name: str) -> list[Developer]:
-        return [dev for dev in self.developers.values() if dev.get_name() == name]
-
-    def search_dev_by_programming_languages(self, languages: list[str]) -> list[Developer]:
-        return [
-            dev for dev in self.developers.values()
-            if all(lang in dev.get_languages() for lang in languages)
-        ]
-
-    def has_leader(self, team_name: str) -> bool:
-        return any(dev for dev in self.developers.values() 
-                   if dev.get_team_name() == team_name and dev.is_leader())
-        
-    def display_all(self):
-        if not self.developers:
-            return None
-        data = [dev.to_dict() for dev in self.developers.values()]
-        # display_table(data)
-        headers = data[0].keys()
-        rows = [list(dev.values()) for dev in data]
-        print(tabulate(rows, headers=headers, tablefmt="pretty", showindex=False))
-        
-    def sort_by_name(self, reverse=False):
-        sorted_devs = sorted(self.developers.values(), key=lambda dev: dev.get_name(), reverse=reverse)
-        data = [dev.to_dict() for dev in sorted_devs]
-        headers = data[0].keys()
-        rows = [list(dev.values()) for dev in data]
-        print(tabulate(rows, headers=headers, tablefmt="pretty", showindex=False))
-
-    def sort_by_salary(self, reverse=True):
-        sorted_devs = sorted(self.developers.values(), key=lambda dev: dev.get_salary(), reverse=reverse)
-        data = [dev.to_dict() for dev in sorted_devs]
-        df = pd.DataFrame(data)
-        print(tabulate(df, headers='keys', tablefmt='pretty', showindex=False))

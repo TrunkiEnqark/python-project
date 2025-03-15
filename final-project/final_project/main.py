@@ -1,6 +1,7 @@
 import os
 
 from models import *
+from controllers import *
 from utils.utils import *
 
 OPTIONS = [
@@ -23,9 +24,9 @@ SEARCH_MENU = [
 tester_manager = TesterManager()
 developer_manager = DevManager()
 
-if __name__ == '__main__':
+def main():
     while True:
-        os.system('cls')
+        # os.system('cls')
         print("\n=== Developer Management System ===")
         choice = menu(OPTIONS)
         match choice:
@@ -46,20 +47,32 @@ if __name__ == '__main__':
                 os.system('cls')
                 # Add Employee (Developer or Tester)
                 emp_name = input("Enter employee name: ")
-                base_sal = int(input("Enter base salary: "))
+                try:
+                    base_sal = int(input("Enter base salary: "))
+                except ValueError:
+                    print("Invalid salary input! Please enter a number.")
+                    continue
                 emp_type = input("Add Developer (d) or Tester (t): ").lower()
 
                 if emp_type == 'd':
                     team_name = input("Enter team name: ")
-                    programming_languages = input("Enter programming languages (comma-separated): ").split(',')
-                    exp_year = int(input("Enter experience years: "))
+                    programming_languages = input("Enter programming languages (comma-separated): ").lower().split(',')
+                    try:
+                        exp_year = int(input("Enter experience years: "))
+                    except ValueError:
+                        print("Invalid experience years input! Please enter a number.")
+                        continue
                     is_leader = False
                     
                     if developer_manager.has_leader(team_name):
                         is_leader = input("Is this developer a leader? (y/n): ").lower() == 'y'
 
                     if is_leader:
-                        bonus_rate = float(input("Enter bonus rate (e.g., 0.1 for 10%): "))
+                        try:
+                            bonus_rate = float(input("Enter bonus rate (e.g., 0.1 for 10%): "))
+                        except ValueError:
+                            print("Invalid bonus rate input! Please enter a number.")
+                            continue
                         new_dev = TeamLeader(emp_name, base_sal, team_name, programming_languages, exp_year, bonus_rate)
                     else:
                         new_dev = Developer(emp_name, base_sal, team_name, programming_languages, exp_year)
@@ -70,14 +83,18 @@ if __name__ == '__main__':
                         print("Error: Failed to add developer. Check for duplicate ID or team leader conflict.")
                 
                 elif emp_type == 't':
-                    test_type = input("Enter tester type (AT/AM/MT): ").upper()
+                    test_type = input("Enter tester type (AM/MT): ").upper()
                     try:
                         tester_type = TesterType[test_type]  
                     except KeyError:
-                        print("Invalid tester type! Choose one of AT, AM, MT.")
+                        print("Invalid tester type! Choose one of AM, MT.")
                         continue
 
-                    bonus_rate = float(input("Enter bonus rate (e.g., 0.1 for 10%): "))
+                    try:
+                        bonus_rate = float(input("Enter bonus rate (e.g., 0.1 for 10%): "))
+                    except ValueError:
+                        print("Invalid bonus rate input! Please enter a number.")
+                        continue
                     emp_id = id_generator() 
                     new_tester = Tester(emp_name, base_sal, bonus_rate, tester_type, emp_id)
 
@@ -102,23 +119,60 @@ if __name__ == '__main__':
 
                     print(f"Current Base Salary: {emp.get_base_salary()}")
                     try:
-                        base_sal = int(input("Enter new base salary (leave blank to keep current): "))
-                        emp.set_base_salary(base_sal)
+                        base_sal = input("Enter new base salary (leave blank to keep current): ")
+                        if base_sal:
+                            emp.set_base_salary(int(base_sal))
                     except ValueError:
-                        pass
+                        print("Invalid input for base salary. Keeping current value.")
 
+                    # Check if the employee is a Developer or TeamLeader
                     if isinstance(emp, Developer):
                         print(f"Current Programming Languages: {', '.join(emp.get_languages())}")
-                        programming_languages = input("Enter new programming languages (comma-separated, leave blank to keep current): ")
+                        programming_languages = input("Enter new programming languages (comma-separated, leave blank to keep current): ").lower()
                         if programming_languages:
                             emp.set_languages(programming_languages.split(','))
-                    
+
+                        print(f"Current Experience Years: {emp.get_exp_year()}")
+                        try:
+                            exp_year = input("Enter new experience years (leave blank to keep current): ")
+                            if exp_year:
+                                emp.set_exp_year(int(exp_year))
+                        except ValueError:
+                            print("Invalid input for experience years. Keeping current value.")
+
+                        # Check if the developer is a TeamLeader
+                        if isinstance(emp, TeamLeader):
+                            print(f"Current Bonus Rate: {emp.get_bonus_rate()}")
+                            try:
+                                bonus_rate = input("Enter new bonus rate (leave blank to keep current): ")
+                                if bonus_rate:
+                                    emp.set_bonus_rate(float(bonus_rate))
+                            except ValueError:
+                                print("Invalid input for bonus rate. Keeping current value.")
+
+                    # Check if the employee is a Tester
+                    elif isinstance(emp, Tester):
+                        print(f"Current Tester Type: {emp.get_type().name}")
+                        tester_type = input("Enter new tester type (AM/MT, leave blank to keep current): ").upper()
+                        if tester_type:
+                            try:
+                                emp.set_type(TesterType[tester_type])
+                            except KeyError:
+                                print("Invalid tester type. Keeping current value.")
+
+                        print(f"Current Bonus Rate: {emp.get_bonus_rate()}")
+                        try:
+                            bonus_rate = input("Enter new bonus rate (leave blank to keep current): ")
+                            if bonus_rate:
+                                emp.set_bonus_rate(float(bonus_rate))
+                        except ValueError:
+                            print("Invalid input for bonus rate. Keeping current value.")
+
                     print("Employee updated successfully!")
                     developer_manager.save_dev()
-                    tester_manager.save_tester()
+                    tester_manager.save_testers()
                 else:
                     print("Error: Employee not found!")
-
             case 4:
                 # Search Employee
                 os.system('cls')
@@ -138,9 +192,12 @@ if __name__ == '__main__':
 
                     case 2:
                         # Find tester with the highest salary
-                        top_tester = tester_manager.get_highest_salary_tester()
+                        highest_salary = tester_manager.get_max_salary()
+                        top_tester = tester_manager.get_highest_salary_testers()
                         if top_tester:
-                            print(f"Tester with the highest salary: {top_tester.get_name()} with salary {top_tester.get_salary()}")
+                            print(f"Testers with the highest salary with {highest_salary}:")
+                            for tester in top_tester:
+                                print(tester)
                         else:
                             print("No testers found.")
 
@@ -156,7 +213,7 @@ if __name__ == '__main__':
 
             case 5:
                 # Store data to file
-                if developer_manager.save_dev() and tester_manager.save_tester():
+                if developer_manager.save_dev() and tester_manager.save_testers():
                     print("Data stored successfully!")
                 else:
                     print("Error storing data!")
@@ -182,3 +239,7 @@ if __name__ == '__main__':
 
             case _:
                 print("Invalid choice. Please try again.")
+
+
+if __name__ == '__main__':
+    main()

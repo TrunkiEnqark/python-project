@@ -1,5 +1,5 @@
 from models.employee import Employee
-from models.developer import Developer, DevManager, TeamLeader
-from models.tester import Tester, TesterManager, TesterType
+from models.developer import Developer, TeamLeader
+from models.tester import Tester, TesterType
 
-__all__ = ["Employee", "Developer", "DevManager", "Tester", "TesterManager", "TeamLeader", "TesterType"]
+__all__ = ["Employee", "Developer", "Tester", "TeamLeader", "TesterType"]
