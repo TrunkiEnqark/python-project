@@ -69,16 +69,15 @@ Then, install the required dependencies:
 poetry install
 ```
 
-### 3. Activate the Virtual Environment
-To activate the virtual environment managed by Poetry, run:
+### 3. Initialize Poetry
 ```sh
-poetry shell
+poetry init
 ```
 
 ## Running the Main Program
 To run the employee management system, use the command:
 ```sh
-python final_project/main.py
+poetry run python -m final_project.main
 ```
 
 ## Running Automated Tests
