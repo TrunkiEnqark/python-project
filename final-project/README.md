@@ -65,12 +65,6 @@ This project uses [Poetry](https://python-poetry.org/) for dependency management
 pip install poetry
 ```
 
-### 3. Initialize Poetry
-```sh
-poetry init
-poetry install
-```
-
 ## Running the Main Program
 To run the employee management system, use the command:
 ```sh
