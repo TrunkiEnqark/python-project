@@ -64,14 +64,11 @@ This project uses [Poetry](https://python-poetry.org/) for dependency management
 ```sh
 pip install poetry
 ```
-Then, install the required dependencies:
-```sh
-poetry install
-```
 
 ### 3. Initialize Poetry
 ```sh
 poetry init
+poetry install
 ```
 
 ## Running the Main Program
