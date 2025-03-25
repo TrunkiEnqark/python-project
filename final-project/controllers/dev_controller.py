@@ -1,7 +1,7 @@
 import os
 import json
-from tabulate import tabulate
 
+from utils.utils import display_table
 from models.developer import Developer, TeamLeader
 
 class DevManager:
@@ -72,27 +72,72 @@ class DevManager:
 
     def has_leader(self, team_name: str) -> bool:
         return any(dev for dev in self.developers.values() 
-                   if dev.get_team_name() == team_name and dev.is_leader())
+                   if dev.get_team_name().lower() == team_name and dev.is_leader())
+    
+    def find_leader(self, team_name: str) -> TeamLeader | None:
+        for dev in self.developers.values():
+            if isinstance(dev, TeamLeader) and dev.get_team_name() == team_name:
+                return dev
+        return None
+    
+    def update_leader(self, dev: Developer) -> bool:
+        if not isinstance(dev, Developer):
+            return False
         
+        team_name = dev.get_team_name()
+        current_leader = self.find_leader(team_name) 
+
+        if current_leader:
+            if current_leader.get_id() == dev.get_id():
+                print(f"{dev.get_name()} is already the Team Leader.")
+                return False
+            
+            print(f"Demoting {current_leader.get_name()} to Developer.")
+            self.developers[current_leader.get_id()] = Developer(
+                emp_name=current_leader.get_name(),
+                base_sal=current_leader.get_base_salary(),
+                team_name=team_name,
+                programming_languages=current_leader.get_languages(),
+                exp_year=current_leader.get_exp_year(),
+                emp_id=current_leader.get_id(),
+                is_leader=False
+            )
+
+        print(f"Promoting {dev.get_name()} as the new Team Leader of {team_name}.")
+        
+        bonus_rate = float(input("Enter bonus rate: "))
+        
+        self.developers[dev.get_id()] = TeamLeader(
+            emp_name=dev.get_name(),
+            base_sal=dev.get_base_salary(),
+            team_name=team_name,
+            programming_languages=dev.get_languages(),
+            exp_year=dev.get_exp_year(),
+            bonus_rate=bonus_rate,
+            emp_id=dev.get_id()
+        )
+
+        self.save_dev()
+        return True
+
     def display_all(self):
         if not self.developers:
-            return None
+            return 
         data = [dev.to_dict() for dev in self.developers.values()]
-        # display_table(data)
-        headers = data[0].keys()
-        rows = [list(dev.values()) for dev in data]
-        print(tabulate(rows, headers=headers, tablefmt="pretty", showindex=False))
+        display_table(data)
         
-    def sort_by_name(self, reverse=False):
-        sorted_devs = sorted(self.developers.values(), key=lambda dev: dev.get_name(), reverse=reverse)
-        data = [dev.to_dict() for dev in sorted_devs]
-        headers = data[0].keys()
-        rows = [list(dev.values()) for dev in data]
-        print(tabulate(rows, headers=headers, tablefmt="pretty", showindex=False))
-
-    def sort_by_salary(self, reverse=True):
-        sorted_devs = sorted(self.developers.values(), key=lambda dev: dev.get_salary(), reverse=reverse)
-        data = [dev.to_dict() for dev in sorted_devs]
-        headers = data[0].keys()
-        rows = [list(dev.values()) for dev in data]
-        print(tabulate(rows, headers=headers, tablefmt="pretty", showindex=False))
+    def sort_by(self, key: str, reverse=False): # key = "name" or "salary"
+        key_map = {
+            "name": lambda d: d.get_name(),
+            "salary": lambda d: d.get_salary()
+        }
+        
+        if key not in key_map:
+            raise ValueError(f"Invalid sort key: {key}. Choose 'name' or 'salary'.")
+        
+        self.developers = {
+            dev.get_id(): dev
+            for dev in sorted(self.developers.values(), key=key_map[key], reverse=reverse)
+        } 
+        data = [dev.to_dict() for dev in self.developers.values()]
+        display_table(data)

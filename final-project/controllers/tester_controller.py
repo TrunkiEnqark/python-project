@@ -1,6 +1,7 @@
 import os
 import json
-from tabulate import tabulate
+
+from utils.utils import display_table
 from models.tester import Tester, TesterType
 
 class TesterManager:
@@ -63,23 +64,21 @@ class TesterManager:
         return [tester for tester in self.testers.values() if tester.get_salary() == max_salary]
     
     def display_all(self):
-        if not self.testers:
-            return None
         data = [dev.to_dict() for dev in self.testers.values()]
-        headers = data[0].keys()
-        rows = [list(dev.values()) for dev in data]
-        print(tabulate(rows, headers=headers, tablefmt="pretty", showindex=False))
-        
-    def sort_by_name(self, reverse=False):
-        sorted_testers = sorted(self.testers.values(), key=lambda tester: tester.get_name(), reverse=reverse)
-        data = [tester.to_dict() for tester in sorted_testers]
-        headers = data[0].keys()
-        rows = [list(dev.values()) for dev in data]
-        print(tabulate(rows, headers=headers, tablefmt="pretty", showindex=False))
+        display_table(data)
 
-    def sort_by_salary(self, reverse=True):
-        sorted_testers = sorted(self.testers.values(), key=lambda tester: tester.get_salary(), reverse=reverse)
-        data = [tester.to_dict() for tester in sorted_testers]
-        headers = data[0].keys()
-        rows = [list(dev.values()) for dev in data]
-        print(tabulate(rows, headers=headers, tablefmt="pretty", showindex=False))
+    def sort_by(self, key: str, reverse=False): # key = "name" or "salary"
+        key_map = {
+            "name": lambda t: t.get_name(),
+            "salary": lambda t: t.get_salary()
+        }
+        
+        if key not in key_map:
+            raise ValueError(f"Invalid sort key: {key}. Choose 'name' or 'salary'.")
+        
+        self.testers = {
+            tester.get_id(): tester
+            for tester in sorted(self.testers.values(), key=key_map[key], reverse=reverse)
+        } 
+        data = [tester.to_dict() for tester in self.testers.values()]
+        display_table(data)

@@ -1,11 +1,5 @@
-import os
-import json
-import pandas as pd
-
 from models.employee import Employee
 from enum import Enum
-from utils.utils import id_generator
-from tabulate import tabulate
 
 class TesterType(Enum):
     AM = 1  # Automation Test 
@@ -23,7 +17,7 @@ class Tester(Employee):
         return f'{super().__str__()}_{self.__type.name}_{str(self.__bonus_rate)}'
     
     def get_salary(self) -> int:
-        return int((1 + self.__bonus_rate) * self._base_sal)
+        return int((1 + self.__bonus_rate) * self.get_base_salary())
 
     def get_type(self) -> TesterType:
         return self.__type
@@ -41,7 +35,8 @@ class Tester(Employee):
         return {
             'emp_id': self.get_id(),
             'emp_name': self.get_name(),
-            'base_sal': self._base_sal,
+            'base_sal': self.get_base_salary(),
+            'salary': self.get_salary(),
             'bonus_rate': self.__bonus_rate,
             'type': self.__type.name,
         }

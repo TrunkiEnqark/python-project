@@ -1,10 +1,5 @@
-import os
-import json
-import pandas as pd
-
 from models.employee import Employee
-from utils.utils import id_generator, display_table
-from tabulate import tabulate
+from utils.utils import id_generator
 
 class Developer(Employee):
     # Constructor
@@ -32,10 +27,10 @@ class Developer(Employee):
     
     def get_salary(self) -> int:
         if self.__exp_year >= 5:
-            return self._base_sal + self.__exp_year * 2000000
+            return self.get_base_salary() + self.__exp_year * 2000000
         elif self.__exp_year >= 3:
-            return self._base_sal + self.__exp_year * 1000000
-        return self._base_sal
+            return self.get_base_salary() + self.__exp_year * 1000000
+        return self.get_base_salary()
     
     def get_team_name(self) -> str:
         return self.__team_name
@@ -44,7 +39,7 @@ class Developer(Employee):
         return {
             'emp_id': self.get_id(),
             'emp_name': self.get_name(),
-            'base_sal': self._base_sal,
+            'base_sal': self.get_base_salary(),
             'team_name': self.__team_name,
             'programming_languages': ','.join(self.__programming_languages),
             'exp_year': self.__exp_year,
@@ -57,7 +52,6 @@ class Developer(Employee):
 
     def set_exp_year(self, new_exp_year: int):
         self.__exp_year = new_exp_year
-
 
 class TeamLeader(Developer):
     # Constructor 

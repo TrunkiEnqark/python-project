@@ -17,7 +17,8 @@ OPTIONS = [
 SEARCH_MENU = [
     'By name',
     'By salary (Tester with highest salary)',
-    'By programming languages'
+    'By programming languages',
+    'Back'
 ]
 
 # Load data
@@ -26,7 +27,7 @@ developer_manager = DevManager()
 
 def main():
     while True:
-        # os.system('cls')
+        os.system('cls')
         print("\n=== Developer Management System ===")
         choice = menu(OPTIONS)
         match choice:
@@ -39,8 +40,8 @@ def main():
                 print('Tester Table:')
                 tester_manager.display_all()
 
-                back = input('Press "b" to go back: ').lower()
-                if back == 'b':
+                any_key = input("Press any key to back to the main menu")
+                if any_key:
                     continue
 
             case 2:
@@ -64,7 +65,7 @@ def main():
                         continue
                     is_leader = False
                     
-                    if developer_manager.has_leader(team_name):
+                    if not developer_manager.has_leader(team_name.lower()):
                         is_leader = input("Is this developer a leader? (y/n): ").lower() == 'y'
 
                     if is_leader:
@@ -105,6 +106,10 @@ def main():
                 else:
                     print("Invalid employee type!")
 
+                any_key = input("Press any key to back to the main menu")
+                if any_key:
+                    continue
+                
             case 3:
                 os.system('cls')
                 # Update Employee
@@ -149,7 +154,12 @@ def main():
                                     emp.set_bonus_rate(float(bonus_rate))
                             except ValueError:
                                 print("Invalid input for bonus rate. Keeping current value.")
-
+                        
+                        if not emp.is_leader():
+                            update_leader = input(f"Do you want to update {emp.get_name()} as a Team Leader ? (y/n): ").lower() == 'y'
+                            if update_leader:
+                                developer_manager.update_leader(emp)
+                                
                     # Check if the employee is a Tester
                     elif isinstance(emp, Tester):
                         print(f"Current Tester Type: {emp.get_type().name}")
@@ -173,43 +183,63 @@ def main():
                     tester_manager.save_testers()
                 else:
                     print("Error: Employee not found!")
+                    
+                any_key = input("Press any key to back to the main menu")
+                if any_key:
+                    continue
+                
             case 4:
                 # Search Employee
-                os.system('cls')
-                print("\n=== Search Employee ===")
-                search_choice = menu(SEARCH_MENU)
+                while True:
+                    os.system('cls')
+                    print("\n=== Search Employee ===")
+                    search_choice = menu(SEARCH_MENU)
 
-                match search_choice:
-                    case 1:
-                        name = input("Enter employee name: ")
-                        results = developer_manager.search_dev_by_name(name) + tester_manager.search_tester_by_name(name)
-                        if results:
-                            print(f"Found {len(results)} employee(s):")
-                            for emp in results:
-                                print(f"- {emp}")
-                        else:
-                            print("No employees found with that name.")
+                    match search_choice:
+                        case 1:
+                            name = input("Enter employee name: ")
+                            results = developer_manager.search_dev_by_name(name) + tester_manager.search_tester_by_name(name)
+                            if results:
+                                print(f"Found {len(results)} employee(s):")
+                                for emp in results:
+                                    print(f"- {emp}")
+                            else:
+                                print("No employees found with that name.")
+                                
+                            any_key = input("Press any key to back to go back.")
+                            if any_key:
+                                continue
+                        case 2:
+                            # Find tester with the highest salary
+                            highest_salary = tester_manager.get_max_salary()
+                            top_tester = tester_manager.get_highest_salary_testers()
+                            if top_tester:
+                                print(f"Testers with the highest salary with {highest_salary}:")
+                                for tester in top_tester:
+                                    print(tester)
+                            else:
+                                print("No testers found.")
+                            
+                            any_key = input("Press any key to back to go back.")
+                            if any_key:
+                                continue
 
-                    case 2:
-                        # Find tester with the highest salary
-                        highest_salary = tester_manager.get_max_salary()
-                        top_tester = tester_manager.get_highest_salary_testers()
-                        if top_tester:
-                            print(f"Testers with the highest salary with {highest_salary}:")
-                            for tester in top_tester:
-                                print(tester)
-                        else:
-                            print("No testers found.")
-
-                    case 3:
-                        languages = input("Enter programming languages (comma-separated): ").split(',')
-                        results = developer_manager.search_dev_by_programming_languages(languages)
-                        if results:
-                            print(f"Found {len(results)} developer(s) proficient in {', '.join(languages)}:")
-                            for dev in results:
-                                print(f"- {dev}")
-                        else:
-                            print("No developers found with those programming languages.")
+                        case 3:
+                            languages = input("Enter programming languages (comma-separated): ").split(',')
+                            results = developer_manager.search_dev_by_programming_languages(languages)
+                            if results:
+                                print(f"Found {len(results)} developer(s) proficient in {', '.join(languages)}:")
+                                for dev in results:
+                                    print(f"- {dev}")
+                            else:
+                                print("No developers found with those programming languages.")
+                                
+                            any_key = input("Press any key to back to go back.")
+                            if any_key:
+                                continue
+                        
+                        case 4:
+                            break
 
             case 5:
                 # Store data to file
@@ -218,20 +248,28 @@ def main():
                 else:
                     print("Error storing data!")
 
+                any_key = input("Press any key to back to the main menu")
+                if any_key:
+                    continue
+                
             case 6:
                 # Sort Employee
                 sort_choice = input("Sort by Name (n) or Salary (s): ").lower()
                 if sort_choice == 'n':
-                    developer_manager.sort_by_name()
-                    tester_manager.sort_by_name()
+                    developer_manager.sort_by("name")
+                    tester_manager.sort_by("name")
                     print("Employees sorted by name.")
                 elif sort_choice == 's':
-                    developer_manager.sort_by_salary()
-                    tester_manager.sort_by_salary()
+                    developer_manager.sort_by("salary", reverse=True)
+                    tester_manager.sort_by("salary", reverse=True)
                     print("Employees sorted by salary.")
                 else:
                     print("Invalid sort option!")
 
+                any_key = input("Press any key to back to the main menu")
+                if any_key:
+                    continue
+                
             case 7:
                 # Exit
                 print("Exiting the Developer Management System. Goodbye!")
